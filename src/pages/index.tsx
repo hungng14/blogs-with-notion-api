@@ -45,7 +45,6 @@ export const getServerSideProps = async (
 ) => {
   try {
     const result = await fetch(`${API_BASE_URL}/api/posts`).then((res) => res.json());
-    console.log(result);
     return {
       props: {
         posts: result.data,
