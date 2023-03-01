@@ -17,7 +17,7 @@ const PostCard = ({ post }: Props) => {
         <img
           src={post.image || imageDefault.src}
           alt=""
-          className="w-full h-full"
+          className="w-full h-full object-cover"
         />
       </div>
       <div className="px-4 py-2 pb-5">

@@ -29,7 +29,7 @@ export default function Home({ posts }: Props) {
                 slug: post.id,
                 tags: post.properties.Tags.multi_select,
                 createdAt: post.created_time,
-                image: post.cover?.external?.url,
+                image: post.cover?.external?.url || post.cover?.file?.url,
               }}
               key={post.id}
             />

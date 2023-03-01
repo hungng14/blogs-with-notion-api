@@ -86,7 +86,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           slug: post.id,
           createdAt: post.created_time,
           tags: post.properties.Tags.multi_select,
-          image: post.cover?.external?.url || null,
+          image: post.cover?.external?.url || post.cover?.file?.url || null,
         },
         postId,
       },
