@@ -1,3 +1,4 @@
+import { NOTION_DATABASE_ID } from "@/config/notion";
 import { notionClient } from "@/libs/notion";
 import { myUpstashRedis } from "@/libs/upstashRedis";
 import { reconnect } from "@/utils/reconnect";
@@ -11,18 +12,27 @@ export default async function handler(
     if (req.method !== "GET") {
       return res.status(404).json({ message: "API NOT FOUND" });
     }
-    const postId = req.query.postId as string;
-    const postCached = await myUpstashRedis.getData(postId);
-    if (postCached) {
-      return res.status(200).json({ data: postCached });
+    const postsCached = await myUpstashRedis.getData("admin-posts");
+    if (postsCached) {
+      return res.status(200).json({ data: postsCached });
     }
     const data = await reconnect(
       async () =>
-        await notionClient.pages.retrieve({
-          page_id: postId,
+        await notionClient.databases.query({
+          database_id: NOTION_DATABASE_ID,
+        //   filter: {
+        //     and: [
+        //       {
+        //         property: "Publish",
+        //         checkbox: {
+        //           equals: true,
+        //         },
+        //       },
+        //     ],
+        //   },
         })
     );
-    await myUpstashRedis.setData(postId, data);
+    await myUpstashRedis.setData("admin-posts", data);
     return res.status(200).json({ data });
   } catch (error) {
     console.log("error", error);

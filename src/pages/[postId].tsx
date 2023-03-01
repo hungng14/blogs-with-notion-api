@@ -3,7 +3,9 @@ import { joinArrObjectToString } from "@/utils/joinArrObjectToString";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import React from "react";
-import postDetailStyle from '@/styles/PostDetail.module.css'
+import postDetailStyle from "@/styles/PostDetail.module.css";
+import Layout from "@/components/layout/Layout";
+import imageDefault from "@/images/blur-image.png";
 
 type Props = {
   postId: string;
@@ -11,44 +13,45 @@ type Props = {
 };
 const PostDetail = ({ post }: Props) => {
   return (
-    <div>
-      <h3 className="font-bold text-3xl mb-4">{post.title}</h3>
-      <div className="text-xs text-gray-500 mb-4">
-        {post.createdAt && new Date(post.createdAt).toDateString()}
-      </div>
-      <div className="mb-8">
-        <img
-          src={
-            post.image ||
-            "https://techcrunch.com/wp-content/uploads/2020/03/GettyImages-1153354404.jpg?w=1390&crop=1"
-          }
-          className="w-full h-80 object-cover rounded-md"
-          alt=""
-        />
-      </div>
-      <div
-        className={`${postDetailStyle.postContent} mb-6`}
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      ></div>
-      <div className="mb">
-        <h4 className="text-xl font-bold">
-          <Link href={"/tags"} className="hover:underline">
-            Tags
-          </Link>
-          :
-        </h4>
-        <div className="flex gap-4 flex-wrap mt-2">
-          {!!post.tags?.length &&
-            post.tags.map((tag: any) => (
-              <Link key={tag.id} passHref href={`/tag/${tag.name}`}>
-                <span className={`block text-base font-light text-orange-500 py-1 px-2 hover:text-orange-600`}>
-                  {tag.name}
-                </span>
-              </Link>
-            ))}
+    <Layout>
+      <div>
+        <h3 className="font-bold text-3xl mb-4">{post.title}</h3>
+        <div className="text-xs text-gray-500 mb-4">
+          {post.createdAt && new Date(post.createdAt).toDateString()}
+        </div>
+        <div className="mb-8">
+          <img
+            src={post.image || imageDefault.src}
+            className="w-full h-80 object-cover rounded-md"
+            alt=""
+          />
+        </div>
+        <div
+          className={`${postDetailStyle.postContent} mb-6`}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        ></div>
+        <div className="mb">
+          <h4 className="text-xl font-bold">
+            <Link href={"/tags"} className="hover:underline">
+              Tags
+            </Link>
+            :
+          </h4>
+          <div className="flex gap-4 flex-wrap mt-2">
+            {!!post.tags?.length &&
+              post.tags.map((tag: any) => (
+                <Link key={tag.id} passHref href={`/tag/${tag.name}`}>
+                  <span
+                    className={`block text-base font-light text-orange-500 py-1 px-2 hover:text-orange-600`}
+                  >
+                    {tag.name}
+                  </span>
+                </Link>
+              ))}
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
@@ -83,7 +86,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           slug: post.id,
           createdAt: post.created_time,
           tags: post.properties.Tags.multi_select,
-          image: post.cover?.external?.url
+          image: post.cover?.external?.url || null,
         },
         postId,
       },

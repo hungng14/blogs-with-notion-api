@@ -1,3 +1,4 @@
+import { NOTION_TAG_DATABASE_ID } from "@/config/notion";
 import { notionClient } from "@/libs/notion";
 import { myUpstashRedis } from "@/libs/upstashRedis";
 import { reconnect } from "@/utils/reconnect";
@@ -11,18 +12,17 @@ export default async function handler(
     if (req.method !== "GET") {
       return res.status(404).json({ message: "API NOT FOUND" });
     }
-    const postId = req.query.postId as string;
-    const postCached = await myUpstashRedis.getData(postId);
-    if (postCached) {
-      return res.status(200).json({ data: postCached });
+    const tagsCached = await myUpstashRedis.getData("tags");
+    if (tagsCached) {
+      return res.status(200).json({ data: tagsCached });
     }
     const data = await reconnect(
       async () =>
-        await notionClient.pages.retrieve({
-          page_id: postId,
+        await notionClient.databases.query({
+          database_id: NOTION_TAG_DATABASE_ID,
         })
     );
-    await myUpstashRedis.setData(postId, data);
+    await myUpstashRedis.setData("tags", data, 6000);
     return res.status(200).json({ data });
   } catch (error) {
     console.log("error", error);

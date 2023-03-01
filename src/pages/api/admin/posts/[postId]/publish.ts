@@ -1,6 +1,5 @@
 import { notionClient } from "@/libs/notion";
 import { myUpstashRedis } from "@/libs/upstashRedis";
-import { reconnect } from "@/utils/reconnect";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -8,22 +7,22 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    if (req.method !== "GET") {
+    if (req.method !== "PUT") {
       return res.status(404).json({ message: "API NOT FOUND" });
     }
     const postId = req.query.postId as string;
-    const postCached = await myUpstashRedis.getData(postId);
-    if (postCached) {
-      return res.status(200).json({ data: postCached });
-    }
-    const data = await reconnect(
-      async () =>
-        await notionClient.pages.retrieve({
-          page_id: postId,
-        })
-    );
-    await myUpstashRedis.setData(postId, data);
-    return res.status(200).json({ data });
+    const data = req.body;
+    const result = await notionClient.pages.update({
+      page_id: postId,
+      properties: {
+        Publish: {
+          checkbox: data.publish
+        },
+      },
+    });
+    myUpstashRedis.deleteKey('posts');
+    myUpstashRedis.setData(postId, result);
+    return res.status(200).json({ success: true, result });
   } catch (error) {
     console.log("error", error);
     return res.status(400).send(error);
