@@ -14,6 +14,7 @@ import httpClient from "@/libs/httpClient";
 import { toast } from "@/components/base/toast/toast";
 import { GetServerSidePropsContext } from "next";
 import { joinArrObjectToString } from "@/utils/joinArrObjectToString";
+import { withAuthPage } from "@/middlewares/withAuthPage";
 
 type Props = {
   tags: string[];
@@ -21,7 +22,6 @@ type Props = {
 };
 
 const EditPost = ({ tags, post }: Props) => {
-    console.log('post', post);
   const Editor = useMemo(
     () =>
       dynamic(() => import("@/components/base/Editor"), {
@@ -147,48 +147,48 @@ const EditPost = ({ tags, post }: Props) => {
 
 export default EditPost;
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  try {
-    const postId = (context.params?.postId || "") as string;
-    const resultTag = await httpClient
-      .get("/api/admin/tags")
-      .then((res) => res.data.data);
-    const postDetail = await httpClient
-      .get(`/api/posts/${postId}`)
-      .then((res) => res.data.data);
+export const getServerSideProps = withAuthPage(
+  async (context) => {
+    try {
+      const postId = (context?.params?.postId || "") as string;
+      const resultTag = await httpClient
+        .get("/api/admin/tags")
+        .then((res) => res.data.data);
+      const postDetail = await httpClient
+        .get(`/api/posts/${postId}`)
+        .then((res) => res.data.data);
 
-    const tags = resultTag.results.map(
-      (tag) => tag.properties.Name.title[0]?.plain_text
-    );
-    return {
-      props: {
-        tags,
-        post: {
-          id: postId,
-          title: joinArrObjectToString(
-            postDetail.properties.Title.title,
-            "plain_text"
-          ),
-          content: joinArrObjectToString(
-            postDetail.properties.Content.rich_text,
-            "plain_text"
-          ),
-          description: joinArrObjectToString(
-            postDetail.properties.Description.rich_text,
-            "plain_text"
-          ),
-          slug: postDetail.id,
-          createdAt: postDetail.created_time,
-          tags: postDetail.properties.Tags.multi_select,
-          image: postDetail.cover?.external?.url || null,
+      const tags = resultTag.results.map(
+        (tag) => tag.properties.Name.title[0]?.plain_text
+      );
+      return {
+        props: {
+          tags,
+          post: {
+            id: postId,
+            title: joinArrObjectToString(
+              postDetail.properties.Title.title,
+              "plain_text"
+            ),
+            content: joinArrObjectToString(
+              postDetail.properties.Content.rich_text,
+              "plain_text"
+            ),
+            description: joinArrObjectToString(
+              postDetail.properties.Description.rich_text,
+              "plain_text"
+            ),
+            slug: postDetail.id,
+            createdAt: postDetail.created_time,
+            tags: postDetail.properties.Tags.multi_select,
+            image: postDetail.cover?.external?.url || null,
+          },
         },
-      },
-    };
-  } catch (error) {
-    return {
-      notFound: true,
-    };
+      };
+    } catch (error) {
+      return {
+        notFound: true,
+      };
+    }
   }
-};
+);

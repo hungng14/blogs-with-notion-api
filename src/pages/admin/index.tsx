@@ -1,4 +1,5 @@
 import AdminLayout from '@/components/layout/Admin'
+import { withAuthPage } from '@/middlewares/withAuthPage'
 import React from 'react'
 
 const Dashboard = () => {
@@ -8,3 +9,10 @@ const Dashboard = () => {
 }
 
 export default Dashboard
+
+
+export const getServerSideProps = withAuthPage((context) => {
+  return {
+    props: {},
+  };
+});

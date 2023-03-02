@@ -12,6 +12,7 @@ import AlertMessage from "@/components/base/AlertMessage";
 import dynamic from "next/dynamic";
 import httpClient from "@/libs/httpClient";
 import { toast } from "@/components/base/toast/toast";
+import { withAuthPage } from "@/middlewares/withAuthPage";
 
 type Props = {
   tags: string[];
@@ -145,7 +146,7 @@ const AddPost = ({ tags }: Props) => {
 
 export default AddPost;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = withAuthPage(async () => {
   try {
     const resultTag = await httpClient
       .get("/api/admin/tags")
@@ -165,4 +166,4 @@ export const getServerSideProps = async () => {
       },
     };
   }
-};
+});

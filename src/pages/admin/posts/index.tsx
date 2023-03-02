@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import Badge from "@/components/base/Badge";
 import { toast } from "@/components/base/toast/toast";
+import { withAuthPage } from "@/middlewares/withAuthPage";
 
 const PostsPage = () => {
   const router = useRouter();
@@ -17,7 +18,6 @@ const PostsPage = () => {
   );
   useEffect(() => {
     httpClient.get("/api/admin/posts").then((res) => {
-      console.log("res", res.data);
       setPosts(res.data.data.results);
     });
   }, []);
@@ -36,9 +36,7 @@ const PostsPage = () => {
         toast(
           {
             type: "success",
-            message: `${
-                isChecked ? "Publish" : "Unpublish"
-            }  successfully`,
+            message: `${isChecked ? "Publish" : "Unpublish"}  successfully`,
           },
           3000
         );
@@ -175,3 +173,9 @@ const PostsPage = () => {
 };
 
 export default PostsPage;
+
+export const getServerSideProps = withAuthPage((context) => {
+  return {
+    props: {},
+  };
+});

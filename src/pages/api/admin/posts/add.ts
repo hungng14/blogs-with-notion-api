@@ -1,5 +1,6 @@
 import { NOTION_DATABASE_ID } from "@/config/notion";
 import { notionClient } from "@/libs/notion";
+import { authGuardApi } from "@/middlewares/authGuardApi";
 import { NextApiRequest, NextApiResponse } from "next";
 // import { IncomingForm } from "formidable";
 // export const config = {
@@ -8,10 +9,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 //   },
 // };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = authGuardApi(async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (req.method !== "POST") {
       return res.status(404).json({ message: "API NOT FOUND" });
@@ -40,7 +38,7 @@ export default async function handler(
       .filter((noEmpty) => noEmpty)
       .map((p) => ({
         text: {
-          content: p + '</p>',
+          content: p + "</p>",
         },
       }));
     const result = await notionClient.pages.create({
@@ -73,7 +71,6 @@ export default async function handler(
         Tags: {
           multi_select: (data.tags || []).map((tag) => ({ name: tag })),
         },
-
       },
     });
     return res.status(200).json({ success: true, result });
@@ -81,4 +78,6 @@ export default async function handler(
     console.log("error", error);
     return res.status(400).send(error);
   }
-}
+});
+
+export default handler;
