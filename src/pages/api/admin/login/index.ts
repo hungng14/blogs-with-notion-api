@@ -53,6 +53,6 @@ export default async function handler(
     return res.status(200).json({ success: true, data: { accessToken } });
   } catch (error) {
     console.log("error", error);
-    return res.status(400).send(error);
+    return res.status(400).json({message: 'Something went wrong'});
   }
 }
