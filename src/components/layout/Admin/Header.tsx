@@ -30,7 +30,7 @@ const Header = () => {
                 ></path>
               </svg>
             </button>
-            <Link href={"/"} className="text-white text-2xl ml-2 md:mr-24">
+            <Link href={"/"} className=" text-black dark:text-white text-2xl ml-2 md:mr-24">
               <span className="text-3xl font-bold">HONES</span>{" "}
               <span className="font-medium">Blogs</span>
             </Link>

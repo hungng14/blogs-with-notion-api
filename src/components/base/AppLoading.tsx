@@ -19,7 +19,7 @@ function AppLoading() {
       {/* <div className={styles.wrapper_logo_app} style={{ background: `url(${logo.src}) no-repeat center`, position: 'absolute', top: 0, bottom: 0, right: 0, left: 0 }}>
     </div> */}
       <div
-        className="d-flex justify-content-center flex-column position-absolute"
+        className="d-flex justify-content-center flex-column absolute"
         style={{
           top: "50%",
           left: "50%",
@@ -27,10 +27,12 @@ function AppLoading() {
           zIndex: 1000,
         }}
       >
-        <h4 className="font-bold" style={{ color: "#fff" }}>
+        <h4 className="font-bold text-white text-center">
           LOADING
         </h4>
-        <BarLoader color="#fff" style={{ textAlign: "center" }} />
+        <div className=" overflow-hidden">
+          <BarLoader className="text-center" color="#fff" width={200} />
+        </div>
       </div>
     </div>
   );

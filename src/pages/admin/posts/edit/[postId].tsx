@@ -116,15 +116,16 @@ const EditPost = ({ tags, post }: Props) => {
           <FormGroup>
             <FormLabel label="Content" required />
             <div>
-              <Editor
-                data={watch("content")}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  setValue("content", data);
-                }}
-              />
+              {
+                Editor && <Editor
+                  data={watch("content")}
+                  onChange={(event, editor) => {
+                    const data = editor.getData();
+                    setValue("content", data);
+                  }}
+                />
+              }
               <AlertMessage message={errors?.content?.message} />
-
               <input
                 type="text"
                 className="hidden"

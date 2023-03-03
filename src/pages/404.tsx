@@ -3,10 +3,9 @@ import Link from "next/link";
 import React from "react";
 
 const PageNotFound = (props: any) => {
-  console.log('props', props);
   return (
     // <Layout>
-      <div className=" h-screen justify-center">
+      <div className=" h-screen justify-center px-4">
         <center className="mt-24 m-auto">
           <svg
             className="emoji-404 "

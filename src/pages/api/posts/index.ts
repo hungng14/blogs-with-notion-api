@@ -3,6 +3,7 @@ import { notionClient } from "@/libs/notion";
 import { myUpstashRedis } from "@/libs/upstashRedis";
 import { reconnect } from "@/utils/reconnect";
 import { NextApiRequest, NextApiResponse } from "next";
+import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,27 +13,41 @@ export default async function handler(
     if (req.method !== "GET") {
       return res.status(404).json({ message: "API NOT FOUND" });
     }
-    const postsCached = await myUpstashRedis.getData("posts");
+    let keyCached = "posts";
+    const query = req.query;
+    if (query.tag) {
+      keyCached += `-${query.tag}`;
+    }
+    const postsCached = await myUpstashRedis.getData(keyCached);
     if (postsCached) {
       return res.status(200).json({ data: postsCached });
     }
-    const data = await reconnect(
-      async () =>
-        await notionClient.databases.query({
-          database_id: NOTION_DATABASE_ID,
-          filter: {
-            and: [
-              {
-                property: "Publish",
-                checkbox: {
-                  equals: true,
-                },
-              },
-            ],
+    const queryFilters: QueryDatabaseParameters = {
+      database_id: NOTION_DATABASE_ID,
+    };
+    queryFilters.filter = {
+      and: [
+        {
+          property: "Publish",
+          checkbox: {
+            equals: true,
           },
-        })
+        },
+      ],
+    };
+    if (query.tag) {
+      queryFilters.filter.and.push({
+        property: "Tags",
+        multi_select: {
+          contains: query.tag as string,
+        },
+      });
+    }
+
+    const data = await reconnect(
+      async () => await notionClient.databases.query(queryFilters)
     );
-    await myUpstashRedis.setData("posts", data);
+    await myUpstashRedis.setData(keyCached, data);
     return res.status(200).json({ data });
   } catch (error) {
     console.log("error", error);

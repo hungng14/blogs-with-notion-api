@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import AppLoading from "@/components/base/AppLoading";
 import ToastContainer from "@/components/base/toast/ToastContainer";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   const [loading, setLoading] = useState(false);
@@ -20,10 +23,10 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router]);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       {loading && <AppLoading />}
       <Component {...pageProps} />
       <ToastContainer />
-    </>
+    </QueryClientProvider>
   );
 }

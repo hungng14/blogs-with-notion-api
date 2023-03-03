@@ -49,7 +49,9 @@ const PostCard = ({ post }: Props) => {
         {post.tags?.length ? (
           <div className="flex flex-wrap gap-1 my-2">
             {post.tags.map((tag) => (
-              <Badge key={tag.id} title={tag.name} selected />
+              <Link href={`/tags/${tag.name}`} key={tag.id}>
+                <Badge key={tag.id} title={tag.name} selected />
+              </Link>
             ))}
           </div>
         ) : null}
